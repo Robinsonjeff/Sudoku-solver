@@ -138,12 +138,78 @@ def createDomain(gameBoard, colList, rowList, squareList):
   return domainDict
 
 
+
+
+
+
+
 #This function just prints a domain at a certain point.
 # point is formated like ex. 0,1 or 3,3.
 def getDomainAtPoint(point, domain):
 
   print(domain[point])
   print(len(domain[point]))
+  return
+
+
+
+def sortDomainByValueLength(domainDict):
+  maxLen = 0
+  domainDictKeys = []
+  domainDictValues = []
+  sortedDomainDict = {}
+
+  #Iterate through the domainDict.Values and create a list we can sort of values. Also creating a max length
+  for value in domainDict.values():
+    domainDictValues.append(value)
+    if len(value) > maxLen:
+      maxLen = len(value)
+
+  #Do the same thing for the keys. 
+  for key in domainDict.keys():
+    domainDictKeys.append(key)
+
+
+
+  # Do this multiple times to find any values missed on each pass. Values that are right next to each other will be missed due to the iteration and removal of keys/value pairs. 
+  while len(domainDictValues) > 0:
+    # Iterate through each length of value to sort them from smallest to largest. 
+    for i in range(1,maxLen+1):
+
+      for value in domainDictValues:
+        # print(value)
+        if len(value) == i:
+         
+          # Store the location of the found key/value for access. 
+          index = domainDictValues.index(value)
+          
+          #First lets add the found value and key at the same index into the new sorted dictionary. 
+          sortedDomainDict[domainDictKeys[domainDictValues.index(value)]] = value
+
+          #Now we need to remove both that key and value from their respective lists so we dont find them again thought iteration.
+          domainDictValues.remove(value)
+          domainDictKeys.remove(domainDictKeys[index])
+
+  
+  return sortedDomainDict
+
+
+
+
+
+
+
+
+
+
+
+
+
+def findLostVal(originalDict, sortedDict):
+  for value in originalDict:
+    if value not in sortedDict:
+      return value
+
 
 
 def main():
@@ -151,7 +217,8 @@ def main():
   colList = createListofColumns(gameBoard1)
   rowList = createListofRows(gameBoard1)
   squareList = createListofSquares(rowList)
-  createDomain(gameBoard1, colList, rowList, squareList)
+  sortedDomainDict = sortDomainByValueLength(createDomain(gameBoard1, colList, rowList, squareList))
+  print(sortedDomainDict)
 
 
 
