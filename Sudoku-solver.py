@@ -26,6 +26,67 @@ gameBoard1 = [
 ]
 
 
+#Gameboard 2.
+# ___________________
+#| 0 0 5|0 1 0|0 0 0 |
+#| 0 0 2|0 0 4|0 3 0 |
+#| 1 0 9|0 0 0|2 0 6 |
+#|-------------------|
+#| 2 0 0|0 3 4|0 0 0 |
+#| 0 4 0|0 0 0|7 0 0 |
+#| 5 0 0|0 0 7|0 0 1 |
+#|-------------------|
+#| 0 0 0|6 0 3|0 0 0 |
+#| 0 6 0|1 0 0|0 0 0 |
+#| 0 0 0|0 7 0|0 5 0 |
+# -------------------
+
+#Size of game board is 9x9 so 81 squares total indexd 0-80.
+gameBoard2 = [
+              0,0,5,0,1,0,0,0,0,
+              0,0,2,0,0,4,0,3,0,
+              1,0,9,0,0,0,2,0,6,
+              2,0,0,0,3,0,0,0,0,
+              0,4,0,0,0,0,7,0,0,
+              5,0,0,0,0,7,0,0,1,
+              0,0,0,6,0,3,0,0,0,
+              0,6,0,1,0,0,0,0,0,
+              0,0,0,0,7,0,0,5,0
+]
+
+
+#Gameboard 3.
+# ___________________
+#| 0 0 1|0 0 2|0 0 0 |
+#| 0 0 5|0 0 6|0 3 0 |
+#| 4 6 0|0 0 5|0 0 0 |
+#|-------------------|
+#| 0 0 0|1 0 4|0 0 0 |
+#| 6 0 0|8 0 0|1 4 3 |
+#| 0 0 0|0 9 0|5 0 8 |
+#|-------------------|
+#| 8 0 0|0 4 9|0 5 0 |
+#| 1 0 0|3 2 0|0 0 0 |
+#| 0 0 9|0 0 0|3 0 0 |
+# -------------------
+
+
+
+
+
+
+
+gameBoard2 = [0,0,5,0,1,0,0,0,0,
+              0,0,2,0,0,4,0,3,0,
+              1,0,9,0,0,0,2,0,6,
+              2,0,0,0,3,0,0,0,0,
+              0,4,0,0,0,0,7,0,0,
+              5,0,0,0,0,7,0,0,1,
+              0,0,0,6,0,3,0,0,0,
+              0,6,0,1,0,0,0,0,0,
+              0,0,0,0,7,0,0,5,0]
+
+
 #This function will take the current game board and return a list of column lists. ex. colList[0] = [0,0,4,0,6,0,8,1,0]
 #into a list
 def createListofColumns(gameBoard):
@@ -111,10 +172,10 @@ def createDomain(gameBoard, colList, rowList, squareList):
   #
   #ex. spot (0,3) = 4. in colList we get that by saying colList[0][2] so y is -1
   # same spot but in rowList we get by saying rowList[2][0] so reverse order and x is -1.
-  # same spot but for squareList all we need to know somehow is that (0,3) is in square 1. if the squares are organized like this
-  # 1 2 3
-  # 4 5 6
-  # 7 8 9
+  # same spot but for squareList all we need to know somehow is that (0,2) - (2,2) is in square 1. if the squares are organized like this
+  # 0 1 2
+  # 3 4 5
+  # 6 7 8
 
   #This will loop us through all 81 spots on the board and create a domain for each of them based on the 3 catagory lists we pass to this function. I will be row counter. J will be column counter. so I is the y coordinate and j is the x coordinate.
   for i in range(0, 9):
@@ -129,7 +190,8 @@ def createDomain(gameBoard, colList, rowList, squareList):
         for k in range(1, 10):
 
           if k not in colList[j] and k not in rowList[
-              i] and k not in squareList[math.floor((i + j) / 3)]:
+              i] and k not in squareList[math.floor((i/3))*3 + math.floor((j/3))]:
+            
             domain.append(k)
         domainDict[str(i) + "," + str(j)] = domain
 
@@ -218,9 +280,32 @@ def main():
   rowList = createListofRows(gameBoard1)
   squareList = createListofSquares(rowList)
   sortedDomainDict = sortDomainByValueLength(createDomain(gameBoard1, colList, rowList, squareList))
-  print(sortedDomainDict)
+  # print(sortedDomainDict)
+
+ 
 
 
 
 main()
 
+
+# What we have -
+# 
+# Domain creation given current board
+# Sorting of this domain for MRV
+# Values in the sorted domain dict are in order from left to right and then up and down so tie breaking is already in place
+# 
+#
+
+
+#Program execution from this point:
+  # First we need to pick the first point in the sorted dictionary.
+  # Assign that point (key) the first value in the list (value)
+  # Remove any empty key/value pairs from the domain dict and the key/value pair from the point we just added.
+  #  If more than one key/value pair (the one we assigned a value) is removed, we know we overlapped another domain and failed. 
+
+
+# Issues we might run into:
+# 
+# 
+# 
