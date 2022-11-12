@@ -1,4 +1,5 @@
 import math
+import re
 #Hw 6 - Sudoku solver using CSP and Backtracking
 #Cole Robinson and Joel Hilliard
 
@@ -21,7 +22,7 @@ import math
 gameBoard1 = [
   0, 0, 1, 0, 0, 2, 0, 0, 0, 0, 0, 5, 0, 0, 6, 0, 3, 0, 4, 6, 0, 0, 0, 5, 0, 0,
   0, 0, 0, 0, 1, 0, 4, 0, 0, 0, 6, 0, 0, 8, 0, 0, 1, 4, 3, 0, 0, 0, 0, 9, 0, 5,
-  0, 8, 8, 0, 0, 0, 4, 9, 0, 5, 0, 1, 0, 0, 3, 2, 0, 0, 0, 0, 0, 0, 9, 0, 0, 0,
+  0, 8, 0, 0, 0, 0, 4, 9, 0, 5, 0, 1, 0, 0, 3, 2, 0, 0, 0, 0, 0, 0, 9, 0, 0, 0,
   3, 0, 0
 ]
 
@@ -69,8 +70,6 @@ gameBoard2 = [
 #| 1 0 0|3 2 0|0 0 0 |
 #| 0 0 9|0 0 0|3 0 0 |
 # -------------------
-
-
 
 
 
@@ -193,10 +192,11 @@ def createDomain(gameBoard, colList, rowList, squareList):
               i] and k not in squareList[math.floor((i/3))*3 + math.floor((j/3))]:
             
             domain.append(k)
-        domainDict[str(i) + "," + str(j)] = domain
+        if(len(domain) != 0):
+         domainDict[str(i) + "," + str(j)] = domain
 
-  for item in domainDict:
-    print(str(item) + " " + str(domainDict[item]) + "\n")
+  # for item in domainDict:
+  #   print(str(item) + " " + str(domainDict[item]) + "\n")
   return domainDict
 
 
@@ -256,21 +256,76 @@ def sortDomainByValueLength(domainDict):
   return sortedDomainDict
 
 
+#This function gets us the first key value pair in the sorted domain dictionary and reformats the key to a list of ints for further use. key_value = ([x,y],[value]) where key_value[0] = [x,y] where x is what row we are in and y is what column. 
+def getFirstKeyValue(sortedDomainDict):
+  
+  key_value = (list(sortedDomainDict.keys())[0].replace(","," ").split(),sortedDomainDict[list(sortedDomainDict.keys())[0]])
+  
+  # print(key_value)
+  return key_value
+
+
+
+#Need to now fix if there are 0 values in the domain we need to not include that value in the domain creation. This will make the if condition in test move work properly.
+
+
+
+def testMove(gameBoard,move,rowList,colList,squareList,domain):
+  start_domain = list(domain)
+
+  # print(start_domain)
+  # print(len(start_domain))
+
+  temp_rowList = list(rowList)
+  temp_colList = list(colList)
+  temp_squareList = list(squareList)
+  temp_gameBoard = list(gameBoard)
+
+  row = int(move[0][0])
+  column = int(move[0][1])
+  move_val = int(move[1][0])
+
+  # print("Before - \n")
+  # print(temp_rowList[row])
+  # print(temp_colList[column])
+  # print(temp_squareList[math.floor((row/3))*3 + math.floor((column/3))])
+
+
+  temp_rowList[row][column] = move_val
+  temp_colList[column][row] = move_val
+     
+  temp_squareList[math.floor((row/3))*3 + math.floor((column/3))][(row % 3)*3 + (column % 3)] = move_val
+  temp_gameBoard[(row*9)+column] = move_val
+  new_domain = createDomain(temp_gameBoard,temp_colList,temp_rowList,temp_squareList)
+  
+  # print(len(list(new_domain)))
+  if (len(list(new_domain)) < len(start_domain)-1):
+
+    return False
+
+
+  # print("After - \n")
+  # print(temp_rowList[row])
+  # print(temp_colList[column])
+  # print(temp_squareList[math.floor((row/3))*3 + math.floor((column/3))])
+
+
+
+
+  return True
+
+def updateDomain(gameboard,move,rowList,colList,squareList,domain):
+  print(testMove(gameboard,move,rowList,colList,squareList,domain))
+  return
 
 
 
 
 
-
-
-
-
-
-
-def findLostVal(originalDict, sortedDict):
-  for value in originalDict:
-    if value not in sortedDict:
-      return value
+# def findLostVal(originalDict, sortedDict):
+#   for value in originalDict:
+#     if value not in sortedDict:
+#       return value
 
 
 
@@ -280,7 +335,17 @@ def main():
   rowList = createListofRows(gameBoard1)
   squareList = createListofSquares(rowList)
   sortedDomainDict = sortDomainByValueLength(createDomain(gameBoard1, colList, rowList, squareList))
-  # print(sortedDomainDict)
+  # testMove(sortedDomainDict.values[0])
+  # values = sortedDomainDict.values()
+  key_value = getFirstKeyValue(sortedDomainDict)
+  updateDomain(gameBoard1,key_value,rowList,colList,squareList,sortedDomainDict)
+
+  #This gives us a the key_value pair at the beginning of the sorted dictionary. Now we need to be able to use this key, disect it, to know what column or row to update. 
+  
+
+
+
+
 
  
 
