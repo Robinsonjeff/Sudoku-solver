@@ -58,32 +58,29 @@ gameBoard2 = [
 
 #Gameboard 3.
 # ___________________
-#| 0 0 1|0 0 2|0 0 0 |
-#| 0 0 5|0 0 6|0 3 0 |
-#| 4 6 0|0 0 5|0 0 0 |
+#| 6 7 0|0 0 0|0 0 0 |
+#| 0 2 5|0 0 0|0 0 0 |
+#| 4 6 0|5 6 0|2 0 0 |
 #|-------------------|
-#| 0 0 0|1 0 4|0 0 0 |
-#| 6 0 0|8 0 0|1 4 3 |
-#| 0 0 0|0 9 0|5 0 8 |
+#| 3 0 0|0 8 0|9 0 0 |
+#| 0 0 0|0 0 0|8 0 1 |
+#| 0 0 0|4 7 0|0 0 0 |
 #|-------------------|
-#| 8 0 0|0 4 9|0 5 0 |
-#| 1 0 0|3 2 0|0 0 0 |
-#| 0 0 9|0 0 0|3 0 0 |
+#| 0 0 8|6 0 0|0 9 0 |
+#| 0 0 0|0 0 0|0 1 0 |
+#| 1 0 6|0 5 0|0 7 0 |
 # -------------------
 
 
-
-
-
-gameBoard2 = [0,0,5,0,1,0,0,0,0,
-              0,0,2,0,0,4,0,3,0,
-              1,0,9,0,0,0,2,0,6,
-              2,0,0,0,3,0,0,0,0,
-              0,4,0,0,0,0,7,0,0,
-              5,0,0,0,0,7,0,0,1,
-              0,0,0,6,0,3,0,0,0,
-              0,6,0,1,0,0,0,0,0,
-              0,0,0,0,7,0,0,5,0]
+gameBoard3 = [6,7,0,0,0,0,0,0,0,
+              0,2,5,0,0,0,0,0,0,
+              4,6,0,5,6,0,2,0,6,
+              3,0,0,0,8,0,9,0,0,
+              0,0,0,0,0,0,8,0,1,
+              0,0,0,4,7,0,0,0,0,
+              0,0,8,6,0,0,0,9,0,
+              0,0,0,0,0,0,0,1,0,
+              1,0,6,0,5,0,0,7,0]
 
 
 #This function will take the current game board and return a list of column lists. ex. colList[0] = [0,0,4,0,6,0,8,1,0]
@@ -258,7 +255,7 @@ def sortDomainByValueLength(domainDict):
 
 #This function gets us the first key value pair in the sorted domain dictionary and reformats the key to a list of ints for further use. key_value = ([x,y],[value]) where key_value[0] = [x,y] where x is what row we are in and y is what column. 
 def getFirstKeyValue(sortedDomainDict):
-  
+  # print(sortedDomainDict)
   key_value = (list(sortedDomainDict.keys())[0].replace(","," ").split(),sortedDomainDict[list(sortedDomainDict.keys())[0]])
   
   # print(key_value)
@@ -269,39 +266,53 @@ def getFirstKeyValue(sortedDomainDict):
 #Need to now fix if there are 0 values in the domain we need to not include that value in the domain creation. This will make the if condition in test move work properly.
 
 
-
-def testMove(gameBoard,move,rowList,colList,squareList,domain):
+#This function goes through all the values in the domain passed to it (which should always be the first in the sorted domain list)
+def testMove(gameBoard,move,domain):
+  
   start_domain = list(domain)
 
   # print(start_domain)
   # print(len(start_domain))
 
-  temp_rowList = list(rowList)
-  temp_colList = list(colList)
-  temp_squareList = list(squareList)
+  temp_rowList = createListofRows(gameBoard)
+  temp_colList = createListofColumns(gameBoard)
+  temp_squareList = createListofSquares(temp_rowList)
   temp_gameBoard = list(gameBoard)
 
-  row = int(move[0][0])
-  column = int(move[0][1])
-  move_val = int(move[1][0])
+ 
 
   # print("Before - \n")
   # print(temp_rowList[row])
   # print(temp_colList[column])
   # print(temp_squareList[math.floor((row/3))*3 + math.floor((column/3))])
 
+  for i in range (0,len(move[1])):
+    row = int(move[0][0])
+    column = int(move[0][1])
+    move_val = int(move[1][i])
+    temp_rowList[row][column] = move_val
+    
+    temp_colList[column][row] = move_val
+      
+    temp_squareList[math.floor((row/3))*3 + math.floor((column/3))][(row % 3)*3 + (column % 3)] = move_val
+    temp_gameBoard[(row*9)+column] = move_val
 
-  temp_rowList[row][column] = move_val
-  temp_colList[column][row] = move_val
-     
-  temp_squareList[math.floor((row/3))*3 + math.floor((column/3))][(row % 3)*3 + (column % 3)] = move_val
-  temp_gameBoard[(row*9)+column] = move_val
-  new_domain = createDomain(temp_gameBoard,temp_colList,temp_rowList,temp_squareList)
-  
-  # print(len(list(new_domain)))
-  if (len(list(new_domain)) < len(start_domain)-1):
+    
+    new_domain = createDomain(temp_gameBoard,temp_colList,temp_rowList,temp_squareList)
+    # print(len(list(new_domain)))
 
-    return False
+    #This checks to make sure we didn't override any domains. The -1 is because the only domain we should lose is the one for the value we assigned.
+    # print("len of new domain" + str(len(list(new_domain))))
+    # print("len of start domain -1 " + str(len(start_domain)-1))
+    # print(new_domain)
+    # print(findLostVal(start_domain,new_domain))
+    if (len(list(new_domain)) == len(start_domain)-1):
+
+      return move_val
+    
+  return -1
+
+    
 
 
   # print("After - \n")
@@ -309,37 +320,73 @@ def testMove(gameBoard,move,rowList,colList,squareList,domain):
   # print(temp_colList[column])
   # print(temp_squareList[math.floor((row/3))*3 + math.floor((column/3))])
 
+def printBoard(gameBoard):
+  boardString = ""
+  for i in range(1,len(gameBoard)+1):
+    
+    if i % 27 == 1:
+      boardString += "-------------\n"
+    if i % 3 == 1:
+      boardString += "|"
+    boardString += str(gameBoard[i-1])
+    if i%9 == 0 :
+      boardString += "|\n"
+  
+  
+  boardString += "-------------\n"
+  
+   
+  return boardString
 
 
+  
 
-  return True
-
-def updateDomain(gameboard,move,rowList,colList,squareList,domain):
-  print(testMove(gameboard,move,rowList,colList,squareList,domain))
+def makeMove(gameBoard,move,rowList,colList,squareList,domain):
+  # print(testMove(gameboard,move,rowList,colList,squareList,domain))
+  best_next_move = testMove(gameBoard,move,domain)
+  # print(best_next_move)
+  if best_next_move != -1:
+    row = int(move[0][0])
+    column = int(move[0][1])
+    rowList[row][column] = best_next_move
+    colList[column][row] = best_next_move
+    gameBoard[(row*9)+column] = best_next_move
+    squareList[math.floor((row/3))*3 + math.floor((column/3))][(row % 3)*3 + (column % 3)] = best_next_move
+    while len(domain) != 0:
+      sortedDomainDict = sortDomainByValueLength(createDomain(gameBoard, colList, rowList, squareList))
+      print(printBoard(gameBoard))
+      if len(domain) > 1:
+        return makeMove(gameBoard,getFirstKeyValue(sortedDomainDict),rowList,colList,squareList,sortedDomainDict)
+      break
   return
 
 
 
 
 
-# def findLostVal(originalDict, sortedDict):
-#   for value in originalDict:
-#     if value not in sortedDict:
-#       return value
+def findLostVal(originalDict, sortedDict):
+  for value in originalDict:
+    if value not in sortedDict:
+      return value
+
+
+def playGame(gameBoard):
+  colList = createListofColumns(gameBoard)
+  rowList = createListofRows(gameBoard)
+  squareList = createListofSquares(rowList)
+  print(len(createDomain(gameBoard, colList, rowList, squareList)))
+  sortedDomainDict = sortDomainByValueLength(createDomain(gameBoard, colList, rowList, squareList))
+  print(len(sortedDomainDict))
+  key_value = getFirstKeyValue(sortedDomainDict)
+  print(key_value)
+  makeMove(gameBoard,key_value,rowList,colList,squareList,sortedDomainDict)
 
 
 
 def main():
-
-  colList = createListofColumns(gameBoard1)
-  rowList = createListofRows(gameBoard1)
-  squareList = createListofSquares(rowList)
-  sortedDomainDict = sortDomainByValueLength(createDomain(gameBoard1, colList, rowList, squareList))
-  # testMove(sortedDomainDict.values[0])
-  # values = sortedDomainDict.values()
-  key_value = getFirstKeyValue(sortedDomainDict)
-  updateDomain(gameBoard1,key_value,rowList,colList,squareList,sortedDomainDict)
-
+    playGame(gameBoard1)
+    #playGame(gameBoard2)
+    #playGame(gameBoard3)
   #This gives us a the key_value pair at the beginning of the sorted dictionary. Now we need to be able to use this key, disect it, to know what column or row to update. 
   
 
