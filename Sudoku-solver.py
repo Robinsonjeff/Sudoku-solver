@@ -1,7 +1,10 @@
 import math
 import re
+import time
 #Hw 6 - Sudoku solver using CSP and Backtracking
-#Cole Robinson and Joel Hilliard
+# Cole Robinson and Joel Hilliard
+
+numOfVariables = 0
 
 #Gameboard 1.
 # ___________________
@@ -25,7 +28,6 @@ gameBoard1 = [
   0, 8, 0, 0, 0, 0, 4, 9, 0, 5, 0, 1, 0, 0, 3, 2, 0, 0, 0, 0, 0, 0, 9, 0, 0, 0,
   3, 0, 0
 ]
-
 
 #Gameboard 2.
 # ___________________
@@ -54,7 +56,6 @@ gameBoard2 = [
               0,6,0,1,0,0,0,0,0,
               0,0,0,0,7,0,0,5,0
 ]
-
 
 #Gameboard 3.
 # ___________________
@@ -96,14 +97,12 @@ def createListofColumns(gameBoard):
     columns = []
 
     for j in range(0, 9):
-      #print("j: " + str(j) + " i: " + str(i))
-      #print(gameBoard[(j*9)+i])
+   
+
       columns.append(gameBoard[(j * 9) + i])
 
     colList.append(columns)
-    #print("columns[] = " + str(columns))
 
-  #print("colList[] = " + str(colList))
 
   return colList
 
@@ -123,8 +122,6 @@ def createListofRows(gameBoard):
 
     rowList.append(rows)
 
-    #print("rows[] = " + str(rows))
-  #print("\nrowList[] = " + str(rowList))
 
   return rowList
 
@@ -146,17 +143,10 @@ def createListofSquares(rowList):
         for k in range(0, 3):
 
           #This gets all of the squares in order. Now just need to append them in proper spots.
-          #print("i = " + str(i) + "Rowlist[" + str(j+(l*3)) + "][" + str(k+(i*3)) + "] = " + str(rowList[j+(l*3)][k+(i*3)]))
           squares.append(rowList[j + (l * 3)][k + (i * 3)])
 
-        #print("End of k")
       squareList.append(squares)
-      #print("End of j")
 
-    #print("End of i")
-  #print("End of l")
-
-  #print("squareList[] = " + str(squareList))
   return squareList
 
 
@@ -192,13 +182,8 @@ def createDomain(gameBoard, colList, rowList, squareList):
         if(len(domain) != 0):
          domainDict[str(i) + "," + str(j)] = domain
 
-  # for item in domainDict:
-  #   print(str(item) + " " + str(domainDict[item]) + "\n")
+ 
   return domainDict
-
-
-
-
 
 
 
@@ -209,7 +194,6 @@ def getDomainAtPoint(point, domain):
   print(domain[point])
   print(len(domain[point]))
   return
-
 
 
 def sortDomainByValueLength(domainDict):
@@ -229,14 +213,13 @@ def sortDomainByValueLength(domainDict):
     domainDictKeys.append(key)
 
 
-
   # Do this multiple times to find any values missed on each pass. Values that are right next to each other will be missed due to the iteration and removal of keys/value pairs. 
   while len(domainDictValues) > 0:
     # Iterate through each length of value to sort them from smallest to largest. 
     for i in range(1,maxLen+1):
 
       for value in domainDictValues:
-        # print(value)
+   
         if len(value) == i:
          
           # Store the location of the found key/value for access. 
@@ -255,15 +238,12 @@ def sortDomainByValueLength(domainDict):
 
 #This function gets us the first key value pair in the sorted domain dictionary and reformats the key to a list of ints for further use. key_value = ([x,y],[value]) where key_value[0] = [x,y] where x is what row we are in and y is what column. 
 def getFirstKeyValue(sortedDomainDict):
-  # print(sortedDomainDict)
+
   key_value = (list(sortedDomainDict.keys())[0].replace(","," ").split(),sortedDomainDict[list(sortedDomainDict.keys())[0]])
   
-  # print(key_value)
+ 
   return key_value
 
-
-
-#Need to now fix if there are 0 values in the domain we need to not include that value in the domain creation. This will make the if condition in test move work properly.
 
 
 #This function goes through all the values in the domain passed to it (which should always be the first in the sorted domain list)
@@ -271,8 +251,6 @@ def testMove(gameBoard,move,domain):
   
   start_domain = list(domain)
 
-  # print(start_domain)
-  # print(len(start_domain))
 
   temp_rowList = createListofRows(gameBoard)
   temp_colList = createListofColumns(gameBoard)
@@ -280,12 +258,6 @@ def testMove(gameBoard,move,domain):
   temp_gameBoard = list(gameBoard)
 
  
-
-  # print("Before - \n")
-  # print(temp_rowList[row])
-  # print(temp_colList[column])
-  # print(temp_squareList[math.floor((row/3))*3 + math.floor((column/3))])
-
   for i in range (0,len(move[1])):
     row = int(move[0][0])
     column = int(move[0][1])
@@ -299,13 +271,17 @@ def testMove(gameBoard,move,domain):
 
     
     new_domain = createDomain(temp_gameBoard,temp_colList,temp_rowList,temp_squareList)
-    # print(len(list(new_domain)))
 
-    #This checks to make sure we didn't override any domains. The -1 is because the only domain we should lose is the one for the value we assigned.
-    # print("len of new domain" + str(len(list(new_domain))))
-    # print("len of start domain -1 " + str(len(start_domain)-1))
-    # print(new_domain)
-    # print(findLostVal(start_domain,new_domain))
+
+  #Report printing
+  # global numOfVariables
+  # if numOfVariables < 4:
+    
+      
+   
+  #   print("\nVariable Selected ~ " + str(move[0])  + " Domain Size = " + str(len(move[1])) + " Variable assigned = " + str(move_val))
+  #   numOfVariables += 1
+
     if (len(list(new_domain)) == len(start_domain)-1):
 
       return move_val
@@ -313,13 +289,6 @@ def testMove(gameBoard,move,domain):
   return -1
 
     
-
-
-  # print("After - \n")
-  # print(temp_rowList[row])
-  # print(temp_colList[column])
-  # print(temp_squareList[math.floor((row/3))*3 + math.floor((column/3))])
-
 def printBoard(gameBoard):
   boardString = ""
   for i in range(1,len(gameBoard)+1):
@@ -339,29 +308,27 @@ def printBoard(gameBoard):
   return boardString
 
 
-  
 
 def makeMove(gameBoard,move,rowList,colList,squareList,domain):
-  # print(testMove(gameboard,move,rowList,colList,squareList,domain))
+
   best_next_move = testMove(gameBoard,move,domain)
-  # print(best_next_move)
+
   if best_next_move != -1:
     row = int(move[0][0])
     column = int(move[0][1])
     rowList[row][column] = best_next_move
     colList[column][row] = best_next_move
+    
     gameBoard[(row*9)+column] = best_next_move
     squareList[math.floor((row/3))*3 + math.floor((column/3))][(row % 3)*3 + (column % 3)] = best_next_move
     while len(domain) != 0:
       sortedDomainDict = sortDomainByValueLength(createDomain(gameBoard, colList, rowList, squareList))
-      print(printBoard(gameBoard))
+      
       if len(domain) > 1:
-        return makeMove(gameBoard,getFirstKeyValue(sortedDomainDict),rowList,colList,squareList,sortedDomainDict)
+        makeMove(gameBoard,getFirstKeyValue(sortedDomainDict),rowList,colList,squareList,sortedDomainDict)
       break
+
   return
-
-
-
 
 
 def findLostVal(originalDict, sortedDict):
@@ -374,50 +341,43 @@ def playGame(gameBoard):
   colList = createListofColumns(gameBoard)
   rowList = createListofRows(gameBoard)
   squareList = createListofSquares(rowList)
-  print(len(createDomain(gameBoard, colList, rowList, squareList)))
+
   sortedDomainDict = sortDomainByValueLength(createDomain(gameBoard, colList, rowList, squareList))
-  print(len(sortedDomainDict))
+
   key_value = getFirstKeyValue(sortedDomainDict)
-  print(key_value)
+
   makeMove(gameBoard,key_value,rowList,colList,squareList,sortedDomainDict)
 
 
-
 def main():
+
+    global numOfVariables
+    game1StartTime = time.time()
+    print("GameBoard 1 ~ ")
     playGame(gameBoard1)
-    #playGame(gameBoard2)
-    #playGame(gameBoard3)
+
+    game1FinishTime = time.time() - game1StartTime
+    print(printBoard(gameBoard1))
+    print("---%s seconds ---" % game1FinishTime)
+
+    
+    print("\n")
+    numOfVariables = 0
+    game2StartTime = time.time()
+    print("GameBoard 2 ~ ")
+    playGame(gameBoard2)
+    game2FinishTime = time.time() - game2StartTime
+    print(printBoard(gameBoard2))
+    print("---%s seconds ---" % game2FinishTime)
+    print("\n")
+    numOfVariables = 0
+    game3StartTime = time.time()
+    print("GameBoard 3 ~ ")
+    playGame(gameBoard3)
+    game3FinishTime = time.time() - game3StartTime
+    print(printBoard(gameBoard3))
+    print("---%s seconds ---" % game3FinishTime)
+    print("\n")
   #This gives us a the key_value pair at the beginning of the sorted dictionary. Now we need to be able to use this key, disect it, to know what column or row to update. 
   
-
-
-
-
-
- 
-
-
-
 main()
-
-
-# What we have -
-# 
-# Domain creation given current board
-# Sorting of this domain for MRV
-# Values in the sorted domain dict are in order from left to right and then up and down so tie breaking is already in place
-# 
-#
-
-
-#Program execution from this point:
-  # First we need to pick the first point in the sorted dictionary.
-  # Assign that point (key) the first value in the list (value)
-  # Remove any empty key/value pairs from the domain dict and the key/value pair from the point we just added.
-  #  If more than one key/value pair (the one we assigned a value) is removed, we know we overlapped another domain and failed. 
-
-
-# Issues we might run into:
-# 
-# 
-# 
